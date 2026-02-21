@@ -60,8 +60,8 @@ public class Core implements AutoCloseable
 	private final Map<String, Consumer<Command>> handlers;
 	private final Events events;
 	private final DiscordEventAdapter eventAdapter;
-	private BiConsumer<LogLevel, String> logHook;
-	private LogLevel minLogLevel;
+	private BiConsumer<LogLevel, String> logHook = CreateParams.DEFAULT_LOG_HOOK;
+	private LogLevel minLogLevel = LogLevel.VERBOSE;
 	private boolean suppressExceptions;
 	private final CorePrivate corePrivate;
 
