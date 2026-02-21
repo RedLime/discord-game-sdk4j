@@ -1,5 +1,6 @@
 package de.jcm.discordgamesdk;
 
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 /**
@@ -82,6 +83,17 @@ public class CreateParams implements AutoCloseable
 		}
 	}
 
+	/**
+	 * <p>Default log hook. Simply prints the log message
+	 * in pattern "<code>[level] message</code>" to {@link System#out}.</p>
+	 */
+	public static final BiConsumer<LogLevel, String> DEFAULT_LOG_HOOK = (level, message) ->
+	{
+		System.out.printf("[%s] %s\n", level, message);
+	};
+
+	LogLevel logLevel;
+	BiConsumer<LogLevel, String> logHook;
 	long flags;
 	long clientID;
 	DiscordEventAdapter eventAdapter;
@@ -166,6 +178,19 @@ public class CreateParams implements AutoCloseable
 	public static long getDefaultFlags()
 	{
 		return Flags.DEFAULT.value;
+	}
+
+	public void setLogHook(LogLevel minLevel, BiConsumer<LogLevel, String> logHook) {
+		this.logLevel = minLevel;
+		this.logHook = logHook;
+	}
+
+	public BiConsumer<LogLevel, String> getLogHook() {
+		return logHook;
+	}
+
+	public LogLevel getLogLevel() {
+		return logLevel;
 	}
 
 	/**

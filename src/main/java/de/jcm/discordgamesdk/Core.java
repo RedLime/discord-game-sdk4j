@@ -41,15 +41,6 @@ public class Core implements AutoCloseable
 			throw new GameSDKException(result);
 	};
 
-	/**
-	 * <p>Default log hook. Simply prints the log message
-	 * in pattern "<code>[level] message</code>" to {@link System#out}.</p>
-	 */
-	public static final BiConsumer<LogLevel, String> DEFAULT_LOG_HOOK= (level, message) ->
-	{
-		System.out.printf("[%s] %s\n", level, message);
-	};
-
 	public static final DiscordChannel getDiscordChannel() throws IOException
 	{
 		if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows"))
@@ -69,8 +60,8 @@ public class Core implements AutoCloseable
 	private final Map<String, Consumer<Command>> handlers;
 	private final Events events;
 	private final DiscordEventAdapter eventAdapter;
-	private BiConsumer<LogLevel, String> logHook = DEFAULT_LOG_HOOK;
-	private LogLevel minLogLevel = LogLevel.VERBOSE;
+	private BiConsumer<LogLevel, String> logHook;
+	private LogLevel minLogLevel;
 	private boolean suppressExceptions;
 	private final CorePrivate corePrivate;
 
@@ -87,7 +78,7 @@ public class Core implements AutoCloseable
 
 	/**
 	 * Creates an instance of the SDK from {@link CreateParams} and
-	 * sets the log hook to {@link Core#DEFAULT_LOG_HOOK}.
+	 * sets the log hook to {@link CreateParams#DEFAULT_LOG_HOOK}.
 	 * <p>
 	 * Example:
 	 * <pre>{@code
@@ -110,6 +101,7 @@ public class Core implements AutoCloseable
         this.createParams = params;
 		this.suppressExceptions = (this.createParams.flags & 1) != 0 || (this.createParams.flags & 2) != 0;
 
+		this.setLogHook(params.getLogLevel(), params.getLogHook());
 		this.state = ConnectionState.HANDSHAKE;
 		this.gson = new Gson();
 		this.nonce = 0;
@@ -507,7 +499,7 @@ public class Core implements AutoCloseable
 	 * Registers a log function.
 	 * @param minLevel Minimal level of message to receive.
 	 * @param logHook Hook to send log messages to.
-	 * @see Core#DEFAULT_LOG_HOOK
+	 * @see CreateParams#DEFAULT_LOG_HOOK
 	 * @see <a href="https://discordapp.com/developers/docs/game-sdk/discord#setloghook">
 	 *     https://discordapp.com/developers/docs/game-sdk/discord#setloghook</a>
 	 */
